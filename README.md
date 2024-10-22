@@ -15,7 +15,7 @@
 <li align=left>Google Analytics</li>
 <li align=left>Clova</li>
 <li align=left>Python</li>
-<li align=left>BrityRPA</li>
+<li align=left>Brity RPA</li>
 <br>
 <h3 align=left>작업인원 및 기간</h3>
 <li align=left>팀원 : 4명</li>
