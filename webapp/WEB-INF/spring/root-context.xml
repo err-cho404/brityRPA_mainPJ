@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mybatis-spring="http://mybatis.org/schema/mybatis-spring"
+	xmlns:task="http://www.springframework.org/schema/task"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://mybatis.org/schema/mybatis-spring http://mybatis.org/schema/mybatis-spring-1.2.xsd
+		http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-4.3.xsd
+		http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3.xsd">
+	
+	<!-- Root Context: defines shared resources visible to all other web components--> 
+	<!-- 여기서 부터 데이터 베이스 작업(MyBatis-Spring을 이요한)과 관련된 설정 -->
+	<!-- hikariCP에서 제공한 데이버 베이스 연결(connection)관련 설정 -->
+	<bean id="hikariConfig" class="com.zaxxer.hikari.HikariConfig">
+ 		<!-- <property name="driverClassName" value="oracle.jdbc.pool.OracleDataSource"></property>
+		<property name="jdbcUrl" value="jdbc:oracle:thin:@localhost:1521:XE"></property> --> 
+		
+		<property name="driverClassName" value="net.sf.log4jdbc.sql.jdbcapi.DriverSpy"></property>
+		<property name="jdbcUrl" value="jdbc:log4jdbc:oracle:thin:@포트"></property>
+		<property name="username" value="id입력"></property>
+		<property name="password" value="pwd입력"></property>
+	</bean>	
+<bean id="datasource" class="com.zaxxer.hikari.HikariDataSource" destroy-method="close"> 
+    <constructor-arg ref="hikariConfig"></constructor-arg> 
+</bean>
+<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="datasource"></property>
+    </bean>
+    <!-- navermail설정 -->
+    <bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl"> 
+     <property name="host" value="서버 호스트"/> <!-- 메이서버 호스트 -->
+     <property name="port" value="서버 포트번호"/> <!-- 메이서버 포트번호 -->
+     <property name="username" value="자신의 이메일"/> <!-- 자신의 이메일 아이디 -->
+     <property name="password" value="자신의 비밀번호"/> <!-- 자신의 비밀번호 -->
+       <!-- 보안연결 SSL과 관련된 설정 -->
+     <property name="javaMailProperties">
+      <props>
+      <prop key="mail.smtp.auth">true</prop>
+      <prop key="mail.smtp.starttls.enable">true</prop>
+      <prop key="mail.smtps.checkserveridentity">true</prop>
+      <prop key="mail.smtps.ssl.trust">*</prop>
+      <prop key="mail.debug">true</prop>
+      <prop key="mail.smtp.socketFactory.class">javax.net.ssl.SSLSocketFactory</prop>
+      <prop key="mail.smtp.ssl.enable">true</prop> 
+      </props>
+     </property>
+    </bean>
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="datasource"></property>
+	</bean>
+    <tx:annotation-driven />
+   <task:annotation-driven/>
+        
+	<!-- MyBatis-Spring에서 제공한 라이브러리를 이용해서 DB CRUD타입을 쉽게 하기위한 설정 -->
+	<mybatis-spring:scan base-package="co.kr.shop.mapper"/>
+    <context:component-scan base-package="co.kr.shop.model"></context:component-scan>
+    <context:component-scan base-package="co.kr.shop.service"></context:component-scan>
+    <context:component-scan base-package="co.kr.shop.task"></context:component-scan>
+	<!--여기까지 데이터 베이스 작업과 관련된 설정  -->
+</beans>
